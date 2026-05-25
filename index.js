@@ -24,4 +24,9 @@ client.on('messageCreate', (message) => {
   // No commands yet
 });
 
+if (!process.env.TOKEN) {
+  console.error('ERROR: No bot token provided. Set TOKEN in your .env file.');
+  process.exit(1);
+}
+
 client.login(process.env.TOKEN);
