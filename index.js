@@ -53,7 +53,11 @@ client.on('messageCreate', async (message) => {
       return message.reply('Could not find a message with that ID in this server.');
     }
 
-    await targetMessage.reply(replyText);
+    try {
+      await targetMessage.reply(replyText);
+    } catch {
+      return message.reply('I don\'t have permission to reply in that channel.');
+    }
   }
 });
 
