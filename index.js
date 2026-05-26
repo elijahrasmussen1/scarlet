@@ -14,7 +14,9 @@ const PREFIX = '-';
 client.once('ready', () => {
   console.log(`Logged in as ${client.user.tag}`);
 
-  client.user.setActivity('watching you...', { type: ActivityType.Custom });
+  client.user.setPresence({
+    activities: [{ name: 'watching you...', type: ActivityType.Custom, state: 'watching you...' }],
+  });
 });
 
 client.on('messageCreate', (message) => {
