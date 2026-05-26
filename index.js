@@ -19,7 +19,7 @@ client.once('ready', () => {
   });
 });
 
-client.on('messageCreate', (message) => {
+client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
   if (!message.content.startsWith(PREFIX)) return;
 
@@ -27,11 +27,33 @@ client.on('messageCreate', (message) => {
   const command = args.shift().toLowerCase();
 
   if (command === 'reply') {
+    const messageId = args.shift();
     const replyText = args.join(' ');
-    if (!replyText) {
-      return message.reply('Please provide a message. Usage: `-reply <message>`');
+
+    if (!messageId || !replyText) {
+      return message.reply('Usage: `-reply <messageId> <message>`');
     }
-    message.reply(replyText);
+
+    // Search all text channels in the server for the message
+    const channels = message.guild.channels.cache.filter(
+      (ch) => ch.isTextBased() && ch.permissionsFor(message.guild.members.me)?.has('ViewChannel')
+    );
+
+    let targetMessage = null;
+    for (const [, channel] of channels) {
+      try {
+        targetMessage = await channel.messages.fetch(messageId);
+        if (targetMessage) break;
+      } catch {
+        // Message not in this channel, continue searching
+      }
+    }
+
+    if (!targetMessage) {
+      return message.reply('Could not find a message with that ID in this server.');
+    }
+
+    await targetMessage.reply(replyText);
   }
 });
 
